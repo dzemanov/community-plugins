@@ -16,7 +16,7 @@
 import type { LoggerService } from '@backstage/backend-plugin-api';
 
 import type { AuditLogger } from '@janus-idp/backstage-plugin-audit-log-node';
-import { Enforcer, FileAdapter, newEnforcer, newModelFromString } from 'casbin';
+import { Enforcer, newEnforcer, newModelFromString } from 'casbin';
 import { parse } from 'csv-parse/sync';
 import { difference } from 'lodash';
 
@@ -37,6 +37,7 @@ import {
   metadataStringToPolicy,
   policyToString,
   transformArrayToPolicy,
+  transformPolicyGroupToLowercase,
 } from '../helper';
 import { EnforcerDelegate } from '../service/enforcer-delegate';
 import { MODEL } from '../service/permission-model';
@@ -48,6 +49,7 @@ import {
   validateSource,
 } from '../validation/policies-validation';
 import { AbstractFileWatcher } from './file-watcher';
+import { LowercaseFileAdapter } from './lowercase-file-adapter';
 
 export const CSV_PERMISSION_POLICY_FILE_AUTHOR = 'csv permission policy file';
 
@@ -86,13 +88,17 @@ export class CSVFileWatcher extends AbstractFileWatcher<string[][]> {
    */
   parse(): string[][] {
     const content = this.getCurrentContents();
-    const parser = parse(content, {
+    const data = parse(content, {
       skip_empty_lines: true,
       relax_column_count: true,
       trim: true,
     });
 
-    return parser;
+    for (const policy of data) {
+      transformPolicyGroupToLowercase(policy);
+    }
+
+    return data;
   }
 
   /**
@@ -114,14 +120,13 @@ export class CSVFileWatcher extends AbstractFileWatcher<string[][]> {
 
     const tempEnforcer = await newEnforcer(
       newModelFromString(MODEL),
-      new FileAdapter(this.filePath),
+      new LowercaseFileAdapter(this.filePath),
     );
 
     // Check for any old policies that will need to be removed by checking if
     // the policy no longer exists in the temp enforcer (csv file)
-    const roleMetadatas = await this.roleMetadataStorage.filterRoleMetadata(
-      'csv-file',
-    );
+    const roleMetadatas =
+      await this.roleMetadataStorage.filterRoleMetadata('csv-file');
     const fileRoles = roleMetadatas.map(meta => meta.roleEntityRef);
 
     if (fileRoles.length > 0) {
@@ -175,9 +180,8 @@ export class CSVFileWatcher extends AbstractFileWatcher<string[][]> {
   // temp enforcer (csv file) and a role metadata storage.
   // We will update role metadata with the new source "csv-file"
   private async migrateLegacyMetadata(tempEnforcer: Enforcer) {
-    let legacyRolesMetadata = await this.roleMetadataStorage.filterRoleMetadata(
-      'legacy',
-    );
+    let legacyRolesMetadata =
+      await this.roleMetadataStorage.filterRoleMetadata('legacy');
     const legacyRoles = legacyRolesMetadata.map(meta => meta.roleEntityRef);
     if (legacyRoles.length > 0) {
       const legacyGroupPolicies = await tempEnforcer.getFilteredGroupingPolicy(
@@ -221,7 +225,7 @@ export class CSVFileWatcher extends AbstractFileWatcher<string[][]> {
 
     const tempEnforcer = await newEnforcer(
       newModelFromString(MODEL),
-      new FileAdapter(this.filePath!),
+      new LowercaseFileAdapter(this.filePath!),
     );
 
     const currentFlatContent = this.currentContent.flatMap(data => {
@@ -470,9 +474,8 @@ export class CSVFileWatcher extends AbstractFileWatcher<string[][]> {
           isUpdate.length > 1,
         );
 
-        const isRolePresent = await this.roleMetadataStorage.findRoleMetadata(
-          roleEntityRef,
-        );
+        const isRolePresent =
+          await this.roleMetadataStorage.findRoleMetadata(roleEntityRef);
         const eventName = isRolePresent
           ? RoleEvents.UPDATE_ROLE
           : RoleEvents.DELETE_ROLE;
@@ -497,9 +500,8 @@ export class CSVFileWatcher extends AbstractFileWatcher<string[][]> {
   }
 
   async cleanUpRolesAndPolicies(): Promise<void> {
-    const roleMetadatas = await this.roleMetadataStorage.filterRoleMetadata(
-      'csv-file',
-    );
+    const roleMetadatas =
+      await this.roleMetadataStorage.filterRoleMetadata('csv-file');
     const fileRoles = roleMetadatas.map(meta => meta.roleEntityRef);
 
     if (fileRoles.length > 0) {
