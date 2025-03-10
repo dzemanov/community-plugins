@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ColorTitle } from '@backstage-community/plugin-techdocs-module-addon-color-title';
 import {
   RELATION_API_CONSUMED_BY,
   RELATION_API_PROVIDED_BY,
@@ -72,6 +73,7 @@ const techdocsContent = (
   <EntityTechdocsContent>
     <TechDocsAddons>
       <ReportIssue />
+      <ColorTitle color="blue" />
     </TechDocsAddons>
   </EntityTechdocsContent>
 );

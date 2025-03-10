@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@backstage-community/plugin-rbac": "workspace:^",
+    "@backstage-community/plugin-techdocs-module-addon-color-title": "^0.1.0",
     "@backstage/app-defaults": "^1.5.16",
     "@backstage/catalog-model": "^1.7.3",
     "@backstage/cli": "^0.29.5",
