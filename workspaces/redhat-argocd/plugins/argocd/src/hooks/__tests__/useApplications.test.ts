@@ -45,7 +45,7 @@ describe('useApplications', () => {
     });
     const { result } = renderHook(() =>
       useApplications({
-        instanceName: 'main',
+        instanceNames: ['main'],
         appSelector: null as unknown as string,
       }),
     );
@@ -64,7 +64,7 @@ describe('useApplications', () => {
     });
     const { result } = renderHook(() =>
       useApplications({
-        instanceName: 'main',
+        instanceNames: ['main'],
         intervalMs: 10000,
         appSelector: 'rht.gitops.com/quarkus-app-bootstrap',
       }),
@@ -81,7 +81,7 @@ describe('useApplications', () => {
   test('should return the applications and loading state', async () => {
     const { result } = renderHook(() =>
       useApplications({
-        instanceName: 'main',
+        instanceNames: ['main'],
         intervalMs: 10000,
         appSelector: 'rht.gitops.com/quarkus-app-bootstrap',
       }),
@@ -104,7 +104,7 @@ describe('useApplications', () => {
 
     const { result, rerender } = renderHook(prop => useApplications(prop), {
       initialProps: {
-        instanceName: 'main',
+        instanceNames: ['main'],
         intervalMs: 10000,
         appSelector: 'rht.gitops.com/quarkus-app-test',
       },
@@ -116,7 +116,7 @@ describe('useApplications', () => {
     });
 
     rerender({
-      instanceName: 'main',
+      instanceNames: ['main'],
       intervalMs: 10000,
       appSelector: 'rht.gitops.com/quarkus-app-bootstrap',
     });
@@ -142,7 +142,7 @@ describe('useApplications', () => {
 
     renderHook(() =>
       useApplications({
-        instanceName: 'main',
+        instanceNames: ['main'],
         intervalMs: 10000,
         appSelector: 'rht.gitops.com/quarkus-app-bootstrap',
       }),
@@ -164,7 +164,7 @@ describe('useApplications', () => {
 
     renderHook(() =>
       useApplications({
-        instanceName: 'main',
+        instanceNames: ['main'],
         intervalMs: 10000,
         appSelector: null as unknown as string,
         appName: 'quarkus-app-bootstrap',
@@ -186,7 +186,7 @@ describe('useApplications', () => {
 
     const { result } = renderHook(prop => useApplications(prop), {
       initialProps: {
-        instanceName: 'main',
+        instanceNames: ['main'],
         intervalMs: 10000,
         appSelector: null as unknown as string,
         appName: 'quarkus-app-test',
@@ -212,7 +212,7 @@ describe('useApplications', () => {
 
     const { result, rerender } = renderHook(prop => useApplications(prop), {
       initialProps: {
-        instanceName: 'main',
+        instanceNames: ['main'],
         intervalMs: 10000,
         appSelector: null as unknown as string,
         appName: 'quarkus-app',
@@ -225,7 +225,7 @@ describe('useApplications', () => {
     });
 
     rerender({
-      instanceName: 'main',
+      instanceNames: ['main'],
       intervalMs: 10000,
       appSelector: null as unknown as string,
       appName: 'quarkus-test-app',

@@ -18,6 +18,7 @@ import pluralize from 'pluralize';
 
 import {
   Application,
+  Instance,
   OperationPhases,
   OperationState,
   Resource,
@@ -45,6 +46,20 @@ export const getAppNamespace = (entity: Entity): string => {
 
 export const getInstanceName = (entity: Entity): string => {
   return entity?.metadata?.annotations?.[ArgoCdLabels.instanceName] ?? '';
+};
+
+export const getInstanceNames = (
+  entity: Entity,
+  instances: Instance[],
+): string[] => {
+  const instanceAnnotation = getInstanceName(entity);
+  if (!instanceAnnotation) {
+    return instances.map(instance => instance.name);
+  }
+  return instanceAnnotation
+    .split(',')
+    .map(name => name.trim())
+    .filter(name => name.length > 0);
 };
 
 export const getProjectName = (entity: Entity): string | undefined => {

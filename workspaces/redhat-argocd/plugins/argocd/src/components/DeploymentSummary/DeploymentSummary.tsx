@@ -33,7 +33,7 @@ import {
 import {
   getArgoCdAppConfig,
   getCommitUrl,
-  getInstanceName,
+  getInstanceNames,
   isAppHelmChartType,
 } from '../../utils/utils';
 import AppSyncStatus from '../AppStatus/AppSyncStatus';
@@ -44,13 +44,13 @@ const DeploymentSummary = () => {
   const { entity } = useEntity();
 
   const { baseUrl, instances, intervalMs } = useArgocdConfig();
-  const instanceName = getInstanceName(entity) || instances?.[0]?.name;
+  const instanceNames = getInstanceNames(entity, instances);
 
   const { appSelector, appName, projectName, appNamespace } =
     getArgoCdAppConfig({ entity });
 
   const { apps, loading, error } = useApplications({
-    instanceName,
+    instanceNames,
     intervalMs,
     appSelector,
     projectName,
@@ -117,7 +117,7 @@ const DeploymentSummary = () => {
       title: `${columnTitles.instance}`,
       field: 'instance',
       render: (row: Application): ReactNode => {
-        return <>{row.metadata?.instance?.name || instanceName}</>;
+        return <>{row.metadata.instance.name}</>;
       },
     },
     {
